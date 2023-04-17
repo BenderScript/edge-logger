@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "edge-logger"
+version = "0.0.1"
+description = "Logging Package for Edge Computing"
+authors = ["reinaldopenno <rapenno@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+packages = [{include = "edge_logger"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
