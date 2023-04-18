@@ -4,8 +4,6 @@ import sys
 from typing import Mapping, Any
 
 
-# https://github.com/tomoum/logzilla/blob/main/src/logzilla/logzilla.py#L145
-
 class JsonFormatter(logging.Formatter):
 
     def __init__(self, indent=False):
