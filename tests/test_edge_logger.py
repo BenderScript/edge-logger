@@ -48,6 +48,7 @@ class TestLogging(unittest.TestCase):
             self.assertEqual(s, "")
 
     def test_extra_fields(self):
+
         with BufferStream(self.logger) as b:
             self.logger.set_handler_level(b.name, "info")
             self.logger.set_handler_formatter(b.name, JsonFormatter())

@@ -5,46 +5,13 @@ from typing import Mapping, Any
 
 
 # https://github.com/tomoum/logzilla/blob/main/src/logzilla/logzilla.py#L145
-class ColorFormatter(logging.Formatter):
-    """Custom formatter for logging module"""
-
-    white = "\x1b[37;20m"
-    green = "\x1b[32;20m"
-    blue = "\x1b[34;20m"
-    cyan = "\x1b[36;20m"
-    yellow = "\x1b[33;20m"
-    red = "\x1b[31;20m"
-    bold_red = "\x1b[31;1m"
-    reset = "\x1b[0m"
-
-    def __init__(self) -> None:
-        super().__init__()
-        self.formats = {
-            logging.DEBUG: self.cyan + "%(message)s" + self.reset,
-            logging.INFO: self.green + "%(message)s" + self.reset,
-            logging.WARNING: self.yellow + "%(message)s" + self.reset,
-            logging.ERROR: self.red + "%(message)s" + self.reset,
-            logging.CRITICAL: self.bold_red + "%(message)s" + self.reset,
-        }
-
-    def format(self, record):
-        log_data = {
-            'time': self.formatTime(record),
-            'level': record.levelname,
-            'name': record.name,
-            'message': record.getMessage(),
-            # 'line': record.lineno,
-        }
-        # If we added extra information, update log record
-        if record.__getattribute__("_extra"):
-            log_data.update(record.__getattribute__("_extra"))
-        log_fmt = self.formats.get(record.levelno)
-        record.msg = json.dumps(log_data)
-        formatter = logging.Formatter(log_fmt)
-        return formatter.format(record)
-
 
 class JsonFormatter(logging.Formatter):
+
+    def __init__(self, indent=False):
+        super().__init__()
+        self._indent = indent
+
     def format(self, record):
         log_data = {
             'time': self.formatTime(record),
@@ -56,7 +23,10 @@ class JsonFormatter(logging.Formatter):
         # If we added extra information, update log record
         if record.__getattribute__("_extra"):
             log_data.update(record.__getattribute__("_extra"))
-        return json.dumps(log_data, indent=4)
+        if self._indent:
+            return json.dumps(log_data, indent=4)
+        else:
+            return json.dumps(log_data)
 
 
 class EdgeLogger(logging.Logger):
