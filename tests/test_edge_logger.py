@@ -1,3 +1,4 @@
+import logging
 import unittest
 from io import StringIO
 from edge_logger.edge_logger import *
@@ -57,6 +58,11 @@ class TestLogging(unittest.TestCase):
             s = "".join(s.split())
             s = json.loads(s)
             self.assertEqual(72, s["temp"])
+
+    def test_multiple_log_instances(self):
+        l1 = logging.getLogger(__name__)
+        l2 = logging.getLogger(__name__)
+        self.assertEqual(id(l1), id(l2))
 
 
 if __name__ == '__main__':
