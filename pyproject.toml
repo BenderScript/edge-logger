@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "edge-logger"
-version = "0.0.3"
+version = "0.0.4"
 description = "Logging Package for Edge Computing"
 authors = ["reinaldopenno <rapenno@gmail.com>"]
 license = "MIT"
@@ -9,6 +9,7 @@ packages = [{include = "edge_logger"}]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+requests = "^2.29.0"
 
 
 [build-system]

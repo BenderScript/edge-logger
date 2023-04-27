@@ -1,6 +1,7 @@
-import logging
 import unittest
 from io import StringIO
+from unittest.mock import patch
+
 from edge_logger.edge_logger import *
 
 
@@ -49,7 +50,6 @@ class TestLogging(unittest.TestCase):
             self.assertEqual(s, "")
 
     def test_extra_fields(self):
-
         with BufferStream(self.logger) as b:
             self.logger.set_handler_level(b.name, "info")
             self.logger.set_handler_formatter(b.name, JsonFormatter())
@@ -63,6 +63,21 @@ class TestLogging(unittest.TestCase):
         l1 = logging.getLogger(__name__)
         l2 = logging.getLogger(__name__)
         self.assertEqual(id(l1), id(l2))
+
+    def my_post_side_effect(self, *args, **kwargs):
+        json_dict = json.loads(kwargs.get("data"))
+        self.assertEqual("test_http_handler", json_dict.get("message"))
+        self.assertEqual("tests.test_edge_logger", json_dict.get("name"))
+
+    @patch("requests.Session.post")
+    def test_http_handler(self, mock_post):
+
+        mock_post.side_effect = self.my_post_side_effect
+        hh = CustomHttpHandler(url="https://httpstat.us/200")
+        hh.setFormatter(JsonFormatter())
+        hh.setLevel("DEBUG")
+        self.logger.addHandler(hh)
+        self.logger.error(self._testMethodName)
 
 
 if __name__ == '__main__':

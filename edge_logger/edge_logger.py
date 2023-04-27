@@ -1,7 +1,58 @@
 import logging
 import json
 import sys
+import concurrent.futures
 from typing import Mapping, Any
+
+import requests
+from requests.adapters import HTTPAdapter, Retry
+
+
+# https://stackoverflow.com/questions/51525237/how-to-set-up-httphandler-for-python-logging
+class CustomHttpHandler(logging.Handler):
+    def __init__(self, url: str):
+        """
+        Initializes the custom http handler
+        Parameters:
+            url (str): The URL that the logs will be sent to
+        """
+        self.url = url
+        #self.token = token
+
+        # sets up a session with the server
+        self.MAX_POOLSIZE = 100
+        self.session = session = requests.Session()
+        session.headers.update({
+            'Content-Type': 'application/json'
+        })
+
+        self.session.mount('https://', HTTPAdapter(
+            max_retries=Retry(
+                total=5,
+                backoff_factor=0.5,
+                status_forcelist=[403, 500]
+            ),
+            pool_connections=self.MAX_POOLSIZE,
+            pool_maxsize=self.MAX_POOLSIZE
+        ))
+
+        super().__init__()
+
+    def emit_process_entry(self, record):
+        json_log = self.format(record)
+        response = self.session.post(self.url, data=json_log)
+        return response
+
+    def emit(self, record):
+        """
+        This function gets called when a log event gets emitted. It receives a
+        record, formats it and sends it to the url
+        Parameters:
+            record: a log record
+        """
+        # self.emit_process_entry(record)
+        with concurrent.futures.ProcessPoolExecutor() as executor:
+            future = executor.submit(self.emit_process_entry, record)
 
 
 class JsonFormatter(logging.Formatter):
