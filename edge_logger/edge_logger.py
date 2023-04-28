@@ -17,7 +17,7 @@ class CustomHttpHandler(logging.Handler):
             url (str): The URL that the logs will be sent to
         """
         self.url = url
-        #self.token = token
+        # self.token = token
 
         # sets up a session with the server
         self.MAX_POOLSIZE = 100
@@ -38,8 +38,8 @@ class CustomHttpHandler(logging.Handler):
 
         super().__init__()
 
-    def emit_process_entry(self, record):
-        json_log = self.format(record)
+    def emit_process_entry(self, json_log):
+        # Send the POST request with the JSON data and headers
         response = self.session.post(self.url, data=json_log)
         return response
 
@@ -50,9 +50,19 @@ class CustomHttpHandler(logging.Handler):
         Parameters:
             record: a log record
         """
-        # self.emit_process_entry(record)
+        json_log = self.format(record)
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            future = executor.submit(self.emit_process_entry, record)
+            future = executor.submit(emit_entry_process_out, json_log, self.url)
+            ret = future.result()
+            print(ret)
+        # self.emit_process_entry(record)
+
+
+def emit_entry_process_out(json_log, url):
+    # Send the POST request with the JSON data and headers
+    headers = {'Content-Type': 'application/json'}
+    response = requests.post(url, data=json_log, headers=headers)
+    return response
 
 
 class JsonFormatter(logging.Formatter):

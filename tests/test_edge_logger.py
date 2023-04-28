@@ -1,3 +1,4 @@
+import random
 import unittest
 from io import StringIO
 from unittest.mock import patch
@@ -78,6 +79,14 @@ class TestLogging(unittest.TestCase):
         hh.setLevel("DEBUG")
         self.logger.addHandler(hh)
         self.logger.error(self._testMethodName)
+
+    def test_http_handler_live(self):
+
+        hh = CustomHttpHandler(url="https://httpstat.us/200")
+        hh.setFormatter(JsonFormatter())
+        hh.setLevel("DEBUG")
+        self.logger.addHandler(hh)
+        self.logger.info(self._testMethodName, extra={'sequence': random.randint(1, 100000)})
 
 
 if __name__ == '__main__':
