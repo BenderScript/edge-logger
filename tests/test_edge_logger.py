@@ -50,6 +50,32 @@ class TestLogging(unittest.TestCase):
             s = "".join(s.split())
             self.assertEqual(s, "")
 
+    def test_levels_info_not_logged(self):
+        with BufferStream(self.logger) as b:
+            self.logger.info("info")
+            s = str(b)
+            s = "".join(s.split())
+            self.assertEqual(s, "info")
+
+    def test_levels_change_only_handler_level(self):
+
+        with BufferStream(self.logger) as b:
+            self.logger.set_handler_level(b.name, "debug")
+            self.logger.debug("debug")
+            s = str(b)
+            s = "".join(s.split())
+            self.assertEqual(s, "debug")
+
+    def test_levels_change_base_level(self):
+
+        with BufferStream(self.logger) as b:
+            self.logger.set_level("DEBUG")
+            self.logger.propagate = False
+            self.logger.debug("debug")
+            s = str(b)
+            s = "".join(s.split())
+            self.assertEqual(s, "debug")
+
     def test_extra_fields(self):
         with BufferStream(self.logger) as b:
             self.logger.set_handler_level(b.name, "info")
@@ -72,7 +98,6 @@ class TestLogging(unittest.TestCase):
 
     @patch("requests.Session.post")
     def test_http_handler(self, mock_post):
-
         mock_post.side_effect = self.my_post_side_effect
         hh = CustomHttpHandler(url="https://httpstat.us/200")
         hh.setFormatter(JsonFormatter())
@@ -81,7 +106,6 @@ class TestLogging(unittest.TestCase):
         self.logger.error(self._testMethodName)
 
     def test_http_handler_live(self):
-
         hh = CustomHttpHandler(url="https://httpstat.us/200")
         hh.setFormatter(JsonFormatter())
         hh.setLevel("DEBUG")

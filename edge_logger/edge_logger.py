@@ -77,7 +77,7 @@ class JsonFormatter(logging.Formatter):
             'level': record.levelname,
             'name': record.name,
             'message': record.getMessage(),
-            # 'line': record.lineno,
+            'line': record.lineno,
         }
         # If we added extra information, update log record
         if record.__getattribute__("_extra"):
@@ -94,18 +94,20 @@ class EdgeLogger(logging.Logger):
     https://docs.python.org/3/library/logging.html#logging.Logger
     """
 
-    def __init__(self, name: str, stream=sys.stdout):
+    def __init__(self, name: str, stream=sys.stdout, logger_level="INFO", console_level="DEBUG"):
+
+        # root logger
         super().__init__(name)
 
         # Base logger level. Messages will be further filtered by each handler.
-        self.setLevel(logging.DEBUG)
+        self.setLevel(logger_level)
 
         # create console handler and set level to info
         ch = logging.StreamHandler(stream=stream)
         ch.set_name("console_handler")
 
         # Console handler log level will filter the messages that are actually sent to stdout.
-        ch.setLevel(logging.INFO)
+        ch.setLevel(console_level)
         ch.setFormatter(JsonFormatter())
 
         # add ch to logger
