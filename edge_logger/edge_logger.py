@@ -94,25 +94,13 @@ class EdgeLogger(logging.Logger):
     https://docs.python.org/3/library/logging.html#logging.Logger
     """
 
-    def __init__(self, name: str, stream=sys.stdout, console_handler=True, logger_level="INFO", console_level="DEBUG"):
+    def __init__(self, name: str):
 
         # root logger
         super().__init__(name)
 
         # Base logger level. Messages will be further filtered by each handler.
-        self.setLevel(logger_level)
-
-        if console_handler:
-            # create console handler and set level to info
-            ch = logging.StreamHandler(stream=stream)
-            ch.set_name("console_handler")
-
-            # Console handler log level will filter the messages that are actually sent to stdout.
-            ch.setLevel(console_level)
-            ch.setFormatter(JsonFormatter())
-
-            # add ch to logger
-            self.addHandler(ch)
+        self.setLevel("INFO")
 
     def add_console_handler(self, stream=sys.stdout, handler_level="INFO"):
         # create console handler and set level to info
