@@ -43,18 +43,25 @@ class CustomHttpHandler(logging.Handler):
         response = self.session.post(self.url, data=json_log)
         return response
 
+    # def emit(self, record):
+    #     """
+    #     This function gets called when a log event gets emitted. It receives a
+    #     record, formats it and sends it to the url
+    #     Parameters:
+    #         record: a log record
+    #     """
+    #     json_log = self.format(record)
+    #     with concurrent.futures.ProcessPoolExecutor() as executor:
+    #         self.emit_process_entry(json_log)
+    #         # future = executor.submit(emit_entry_process_out, json_log, self.url)
+    #         _ = executor.submit(emit_entry_process_out, json_log, self.url)
+    #         # _ = future.result()
+
     def emit(self, record):
-        """
-        This function gets called when a log event gets emitted. It receives a
-        record, formats it and sends it to the url
-        Parameters:
-            record: a log record
-        """
         json_log = self.format(record)
-        with concurrent.futures.ProcessPoolExecutor() as executor:
-            # future = executor.submit(emit_entry_process_out, json_log, self.url)
-            _ = executor.submit(emit_entry_process_out, json_log, self.url)
-            # _ = future.result()
+        self.session.post(self.url, data=json_log)
+        # response = self.session.post(self.url, data=json_log)
+        # return response
 
 
 def emit_entry_process_out(json_log, url):
