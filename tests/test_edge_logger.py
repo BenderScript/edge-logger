@@ -64,7 +64,7 @@ class TestLogging(unittest.TestCase):
             self.logger.debug("debug")
             s = str(b)
             s = "".join(s.split())
-            self.assertEqual(s, "debug")
+            self.assertEqual(s, "")
 
     def test_levels_change_base_level(self):
 
@@ -75,6 +75,7 @@ class TestLogging(unittest.TestCase):
             s = str(b)
             s = "".join(s.split())
             self.assertEqual(s, "debug")
+            self.logger.set_level("INFO")
 
     def test_extra_fields(self):
         with BufferStream(self.logger) as b:
@@ -99,18 +100,15 @@ class TestLogging(unittest.TestCase):
     @patch("requests.Session.post")
     def test_http_handler(self, mock_post):
         mock_post.side_effect = self.my_post_side_effect
-        hh = CustomHttpHandler(url="https://httpstat.us/200")
-        hh.setFormatter(JsonFormatter())
-        hh.setLevel("DEBUG")
-        self.logger.addHandler(hh)
+        self.logger.add_http_handler(url="https://httpstat.us/200", handler_level="INFO")
         self.logger.error(self._testMethodName)
+        self.logger.remove_handler("http_handler")
 
     def test_http_handler_live(self):
-        hh = CustomHttpHandler(url="https://httpstat.us/200")
-        hh.setFormatter(JsonFormatter())
-        hh.setLevel("DEBUG")
-        self.logger.addHandler(hh)
+        self.logger.add_http_handler(url="https://httpstat.us/200", handler_level="DEBUG")
+        self.logger.error(self._testMethodName)
         self.logger.info(self._testMethodName, extra={'sequence': random.randint(1, 100000)})
+        self.logger.remove_handler("http_handler")
 
 
 if __name__ == '__main__':

@@ -94,7 +94,7 @@ class EdgeLogger(logging.Logger):
     https://docs.python.org/3/library/logging.html#logging.Logger
     """
 
-    def __init__(self, name: str, stream=sys.stdout, logger_level="INFO", console_level="DEBUG"):
+    def __init__(self, name: str, stream=sys.stdout, console_handler=True, logger_level="INFO", console_level="DEBUG"):
 
         # root logger
         super().__init__(name)
@@ -102,16 +102,36 @@ class EdgeLogger(logging.Logger):
         # Base logger level. Messages will be further filtered by each handler.
         self.setLevel(logger_level)
 
+        if console_handler:
+            # create console handler and set level to info
+            ch = logging.StreamHandler(stream=stream)
+            ch.set_name("console_handler")
+
+            # Console handler log level will filter the messages that are actually sent to stdout.
+            ch.setLevel(console_level)
+            ch.setFormatter(JsonFormatter())
+
+            # add ch to logger
+            self.addHandler(ch)
+
+    def add_console_handler(self, stream=sys.stdout, handler_level="INFO"):
         # create console handler and set level to info
         ch = logging.StreamHandler(stream=stream)
         ch.set_name("console_handler")
 
         # Console handler log level will filter the messages that are actually sent to stdout.
-        ch.setLevel(console_level)
+        ch.setLevel(handler_level)
         ch.setFormatter(JsonFormatter())
 
         # add ch to logger
         self.addHandler(ch)
+
+    def add_http_handler(self, url, handler_level="INFO"):
+        hh = CustomHttpHandler(url=url)
+        hh.set_name("http_handler")
+        hh.setFormatter(JsonFormatter())
+        hh.setLevel(handler_level)
+        self.addHandler(hh)
 
     def makeRecord(
             self,

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "edge-logger"
-version = "0.0.6"
+version = "0.0.7"
 description = "Logging Package for Edge Computing"
 authors = ["reinaldopenno <rapenno@gmail.com>"]
 license = "MIT"
