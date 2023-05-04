@@ -28,7 +28,7 @@ class CustomHttpHandler(logging.Handler):
 
         self.session.mount('https://', HTTPAdapter(
             max_retries=Retry(
-                total=5,
+                total=2,
                 backoff_factor=0.5,
                 status_forcelist=[403, 500]
             ),
@@ -52,10 +52,9 @@ class CustomHttpHandler(logging.Handler):
         """
         json_log = self.format(record)
         with concurrent.futures.ProcessPoolExecutor() as executor:
-            future = executor.submit(emit_entry_process_out, json_log, self.url)
-            ret = future.result()
-            print(ret)
-        # self.emit_process_entry(record)
+            # future = executor.submit(emit_entry_process_out, json_log, self.url)
+            _ = executor.submit(emit_entry_process_out, json_log, self.url)
+            # _ = future.result()
 
 
 def emit_entry_process_out(json_log, url):
