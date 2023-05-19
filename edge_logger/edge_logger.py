@@ -28,7 +28,7 @@ class CustomHttpHandler(logging.Handler):
 
         self.session.mount('https://', HTTPAdapter(
             max_retries=Retry(
-                total=2,
+                total=1,
                 backoff_factor=0.5,
                 status_forcelist=[403, 500]
             ),
@@ -59,7 +59,10 @@ class CustomHttpHandler(logging.Handler):
 
     def emit(self, record):
         json_log = self.format(record)
-        self.session.post(self.url, data=json_log)
+        try:
+            self.session.post(self.url, data=json_log, timeout=1)
+        except requests.exceptions.RequestException as e:
+            pass
         # response = self.session.post(self.url, data=json_log)
         # return response
 
